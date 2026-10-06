@@ -5,6 +5,9 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": ["node"],
+    // Resolve type packages from the workspace root's hoisted node_modules as well as a
+    // local install, so editors agree with tsc in this npm-workspaces layout.
+    "typeRoots": ["./node_modules/@types", "../node_modules/@types"],
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
