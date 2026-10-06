@@ -1,0 +1,23 @@
+{
+  "note": "Grading repositories for COMS3011A. Each `ref` is the exact commit hash the sample metrics were produced from; null means the hash has not been supplied yet. Pin these before trusting any metric comparison.",
+  "repos": [
+    {
+      "id": "cjson",
+      "name": "cJSON",
+      "url": "https://github.com/DaveGamble/cJSON.git",
+      "ref": null
+    },
+    {
+      "id": "redis",
+      "name": "Redis",
+      "url": "https://github.com/redis/redis.git",
+      "ref": null
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "url": "https://github.com/git/git.git",
+      "ref": null
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@sdp-rat/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express API, SQLite storage and the metric engine.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "unzipper": "^0.12.5"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
+  }
+}

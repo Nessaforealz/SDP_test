@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Ingested repository data and SQLite databases
+# (a bare "data/" matches at any depth, so server/data/ is covered too)
+data/
+*.sqlite
+*.sqlite-*
+*.db
+
+# Dashboard build output
+web/dist/
+
+# Logs and OS noise
+*.log
+.DS_Store

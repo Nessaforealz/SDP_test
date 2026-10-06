@@ -1,0 +1,26 @@
+{
+  "name": "sdp-rat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Repo Analysis Tool (RAT) - COMS3011A. File, directory, repository, commit-set and author metrics over git history.",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm run dev --workspace server",
+    "dev:web": "npm run dev --workspace web",
+    "build": "npm run build --workspace web",
+    "start": "npm run start --workspace server",
+    "test": "npm run test --workspaces --if-present",
+    "verify:repo": "node scripts/verify-repo.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
