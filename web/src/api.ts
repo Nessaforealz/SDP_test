@@ -19,3 +19,13 @@ export async function getJson<T>(path: string, params: Record<string, QueryValue
   }
   return (await response.json()) as T
 }
+
+/** POST a multipart form and parse the JSON response; the server's error code becomes the message. */
+export async function postForm<T>(path: string, form: FormData): Promise<T> {
+  const response = await fetch(`/api${path}`, { method: 'POST', body: form })
+  const body = (await response.json().catch(() => null)) as ({ error?: string } & T) | null
+  if (!response.ok) {
+    throw new Error(body?.error ?? `${response.status} ${response.statusText}`)
+  }
+  return body as T
+}

@@ -39,6 +39,6 @@ describe('scaffold smoke tests', () => {
     const row = db
       .prepare("SELECT value FROM meta WHERE key = 'schema_version'")
       .get() as { value: string }
-    expect(row.value).toBe('1')
+    expect(row.value).toBe('2')
   })
 })

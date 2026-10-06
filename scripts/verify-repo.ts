@@ -8,8 +8,8 @@
  * directory, and the pinned grading repositories.
  *
  * Not yet covered, and added as those stages land:
- *   - synthetic fixture metrics (Stage 1 oracle)
- *   - cJSON/Redis/Git metric comparison against the supplied samples (Stage 6)
+ *   - cJSON/Redis/Git metric comparison against the supplied samples (Stage 6); synthetic
+ *     fixture metrics are already pinned by server/test.
  */
 import { execFileSync } from 'node:child_process'
 import { accessSync, constants, mkdirSync, readFileSync } from 'node:fs'
@@ -107,7 +107,7 @@ console.log(rule)
 const failed = checks.filter((item) => !item.ok)
 if (failed.length === 0) {
   console.log(`${checks.length}/${checks.length} checks passed.`)
-  console.log('Metric correctness not yet covered (synthetic fixtures and pinned samples).\n')
+  console.log('Synthetic fixture metrics are pinned by server/test; grading samples not supplied yet.\n')
 } else {
   console.log(`${failed.length} of ${checks.length} checks failed.\n`)
 }
