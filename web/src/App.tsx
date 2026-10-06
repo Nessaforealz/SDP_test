@@ -1,8 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
-import { getJson } from './api.js'
+import { getJson } from './api'
 
-const METRIC_FAMILIES = [
+interface MetricFamily {
+  scope: string
+  detail: string
+}
+
+interface HealthResponse {
+  status: string
+  storage: string
+}
+
+type ApiState =
+  | { status: 'checking'; detail: string }
+  | { status: 'ok'; detail: string }
+  | { status: 'unreachable'; detail: string }
+
+const METRIC_FAMILIES: MetricFamily[] = [
   { scope: 'File', detail: 'added lines, removed lines, growth, churn' },
   { scope: 'Directory', detail: 'the same four, rolled up over immediate children' },
   { scope: 'Repository', detail: 'directory metrics at the root of the commit tree' },
@@ -11,16 +26,17 @@ const METRIC_FAMILIES = [
 ]
 
 function ApiStatus() {
-  const [state, setState] = useState({ status: 'checking', detail: '' })
+  const [state, setState] = useState<ApiState>({ status: 'checking', detail: '' })
 
   useEffect(() => {
     let cancelled = false
-    getJson('/health')
+    getJson<HealthResponse>('/health')
       .then((body) => {
         if (!cancelled) setState({ status: 'ok', detail: `storage ${body.storage}` })
       })
-      .catch((error) => {
-        if (!cancelled) setState({ status: 'unreachable', detail: error.message })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error)
+        if (!cancelled) setState({ status: 'unreachable', detail: message })
       })
     return () => {
       cancelled = true

@@ -17,10 +17,14 @@
     "dev:web": "npm run dev --workspace web",
     "build": "npm run build --workspace web",
     "start": "npm run start --workspace server",
-    "test": "npm run test --workspaces --if-present",
-    "verify:repo": "node scripts/verify-repo.mjs"
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tsconfig.json --noEmit",
+    "test": "npm run typecheck && npm run test --workspaces --if-present",
+    "verify:repo": "tsx scripts/verify-repo.ts"
   },
   "devDependencies": {
-    "concurrently": "^9.2.4"
+    "@types/node": "^18.19.130",
+    "concurrently": "^9.2.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }

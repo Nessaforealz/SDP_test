@@ -18,24 +18,46 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const MIN_NODE = [18, 19]
+const MIN_NODE = [18, 19] as const
 
-const checks = []
+interface CheckResult {
+  name: string
+  ok: boolean
+  detail: string
+}
 
-function assert(condition, message) {
+interface PinnedRepo {
+  id: string
+  name: string
+  url: string
+  ref: string | null
+}
+
+/** Minimal shape of the native module, so a missing install is reported rather than thrown. */
+interface SqliteLike {
+  prepare(sql: string): { get(): unknown }
+  close(): void
+}
+type SqliteConstructor = new (file: string) => SqliteLike
+
+const checks: CheckResult[] = []
+
+function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message)
 }
 
-function check(name, run) {
+function check(name: string, run: () => string | void): void {
   try {
     checks.push({ name, ok: true, detail: run() ?? 'ok' })
   } catch (error) {
-    checks.push({ name, ok: false, detail: error.message })
+    checks.push({ name, ok: false, detail: error instanceof Error ? error.message : String(error) })
   }
 }
 
 check('node >= 18.19', () => {
-  const [major, minor] = process.versions.node.split('.').map(Number)
+  const parts = process.versions.node.split('.').map(Number)
+  const major = parts[0] ?? 0
+  const minor = parts[1] ?? 0
   const supported = major > MIN_NODE[0] || (major === MIN_NODE[0] && minor >= MIN_NODE[1])
   assert(supported, `requires >= ${MIN_NODE.join('.')}, running ${process.versions.node}`)
   return `v${process.versions.node}`
@@ -45,12 +67,12 @@ check('git on PATH', () => execFileSync('git', ['--version'], { encoding: 'utf8'
 
 check('storage layer (better-sqlite3)', () => {
   const require = createRequire(import.meta.url)
-  const Database = require('better-sqlite3')
+  const Database = require('better-sqlite3') as SqliteConstructor
   const db = new Database(':memory:')
   try {
-    const row = db.prepare('SELECT sqlite_version() AS version').get()
+    const row = db.prepare('SELECT sqlite_version() AS version').get() as { version?: unknown }
     assert(typeof row?.version === 'string', 'sqlite_version() returned no version')
-    return `sqlite ${row.version} via better-sqlite3`
+    return `sqlite ${String(row.version)} via better-sqlite3`
   } finally {
     db.close()
   }
@@ -64,10 +86,11 @@ check('data directory writable', () => {
 })
 
 check('pinned repo manifest', () => {
-  const manifest = JSON.parse(readFileSync(join(REPO_ROOT, 'fixtures', 'pinned-repos.json'), 'utf8'))
+  const raw = readFileSync(join(REPO_ROOT, 'fixtures', 'pinned-repos.json'), 'utf8')
+  const manifest = JSON.parse(raw) as { repos?: PinnedRepo[] }
   const repos = manifest.repos ?? []
   assert(repos.length >= 3, `expected at least 3 grading repositories, found ${repos.length}`)
-  const pinned = repos.filter((repo) => repo.ref).length
+  const pinned = repos.filter((repo) => repo.ref !== null && repo.ref !== '').length
   const suffix = pinned < repos.length ? ' (sample hashes not supplied yet)' : ''
   return `${repos.length} repos, ${pinned} refs pinned${suffix}`
 })

@@ -13,10 +13,16 @@ const DEFAULT_FILE = join(REPO_ROOT, 'data', 'rat.sqlite')
 const SCHEMA_VERSION = 1
 
 /**
+ * Derived from the constructor rather than named directly, because better-sqlite3 ships as
+ * `export =` and the instance interface lives inside its namespace.
+ */
+export type SqliteDatabase = InstanceType<typeof Database>
+
+/**
  * Open a database, creating the file and schema when needed.
  * Pass ':memory:' for tests.
  */
-export function openDatabase(file = process.env.RAT_DB ?? DEFAULT_FILE) {
+export function openDatabase(file: string = process.env.RAT_DB ?? DEFAULT_FILE): SqliteDatabase {
   if (file !== ':memory:') mkdirSync(dirname(file), { recursive: true })
 
   const db = new Database(file)
@@ -31,7 +37,7 @@ export function openDatabase(file = process.env.RAT_DB ?? DEFAULT_FILE) {
  * metric tables are shaped by the correctness contract, so they land with their own stages
  * rather than being guessed at here.
  */
-function migrate(db) {
+function migrate(db: SqliteDatabase): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS meta (
       key   TEXT PRIMARY KEY,

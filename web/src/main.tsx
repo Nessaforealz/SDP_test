@@ -1,10 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
+import App from './App'
 import './styles.css'
 
-createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root')
+if (container === null) {
+  throw new Error('index.html is missing the #root container')
+}
+
+createRoot(container).render(
   <StrictMode>
     <BrowserRouter>
       <App />

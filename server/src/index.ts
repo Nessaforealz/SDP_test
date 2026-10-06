@@ -8,7 +8,7 @@ const server = createApp({ db }).listen(PORT, () => {
   console.log(`[rat] API listening on http://localhost:${PORT}`)
 })
 
-for (const signal of ['SIGINT', 'SIGTERM']) {
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.on(signal, () => {
     server.close(() => {
       db.close()

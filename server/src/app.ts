@@ -1,22 +1,27 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import express from 'express'
+import express, { type Express } from 'express'
+import type { SqliteDatabase } from './db.js'
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url))
 const WEB_DIST = join(REPO_ROOT, 'web', 'dist')
+
+export interface AppOptions {
+  db?: SqliteDatabase
+}
 
 /**
  * Build the Express application. Kept separate from process startup so tests can mount it
  * on an ephemeral port.
  */
-export function createApp({ db } = {}) {
+export function createApp({ db }: AppOptions = {}): Express {
   const app = express()
   app.use(express.json({ limit: '1mb' }))
 
   // Health is the only endpoint at scaffold time. It also proves the path the Vite dev
   // proxy forwards to.
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (_req, res) => {
     res.json({
       status: 'ok',
       service: 'sdp-rat',

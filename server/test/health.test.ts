@@ -1,22 +1,24 @@
+import type { Server } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 import { createApp } from '../src/app.js'
-import { openDatabase } from '../src/db.js'
+import { openDatabase, type SqliteDatabase } from '../src/db.js'
 
-let db
-let server
-let baseUrl
+let db: SqliteDatabase
+let server: Server
+let baseUrl: string
 
 beforeAll(async () => {
   db = openDatabase(':memory:')
   const app = createApp({ db })
-  server = await new Promise((resolve) => {
+  server = await new Promise<Server>((resolve) => {
     const instance = app.listen(0, '127.0.0.1', () => resolve(instance))
   })
-  baseUrl = `http://127.0.0.1:${server.address().port}`
+  baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
 })
 
 afterAll(async () => {
-  await new Promise((resolve) => server.close(resolve))
+  await new Promise<void>((resolve) => server.close(() => resolve()))
   db.close()
 })
 
@@ -34,7 +36,9 @@ describe('scaffold smoke tests', () => {
   })
 
   test('a fresh database carries the schema version', () => {
-    const row = db.prepare("SELECT value FROM meta WHERE key = 'schema_version'").get()
+    const row = db
+      .prepare("SELECT value FROM meta WHERE key = 'schema_version'")
+      .get() as { value: string }
     expect(row.value).toBe('1')
   })
 })
